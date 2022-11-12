@@ -98,17 +98,17 @@ Options:
   -s, --sim         run risc-v simulator
   -b, --bin         binary data file
   -d, --dbg         debug run
-  -m, --memdump     memory dump
+  -m, --memdump     memory dump (dump length)
   --help            display usage information
 ```
 
 For example, execute under command if source file name is test.asm and you want to execute debug mode and memory dump mode.
 ```
-cargo run test.asm --dbg ---memdump
+cargo run test.asm --dbg ---memdump 256
 ```
 or
 ```
-cargo run test.asm -d -m
+cargo run test.asm -d -m 256
 ```
 
 Update history

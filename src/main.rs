@@ -31,9 +31,9 @@ struct Args {
 	#[argh(switch, short = 'd')]
 	dbg: bool,
 
-	/// memory dump
-	#[argh(switch, short = 'm')]
-	memdump: bool,
+	/// memory dump (dump length)
+	#[argh(option, short = 'm', default = "0")]
+	memdump: u32,
 }
 
 fn main() {
@@ -54,12 +54,12 @@ fn main() {
 			vm.start();
 		}
 
-		if ag.memdump {
+		if ag.memdump != 0 {
 			let d: u32 = vm.cpu.memory.read(0);
 			println!("[Memory dump mode]");
 			println!("Address[{:08x}]: {:08x} ",0, d);
 
-			for i in 1..30 {
+			for i in 1..(ag.memdump / 4 + 1) {
 				let d: u32 = vm.cpu.memory.read(i*4);
 				println!("Address[{:08x}]: {:08x} ",i*4, d);
 			}
@@ -79,12 +79,12 @@ fn main() {
 				vm.start();
 			}
 
-			if ag.memdump {
+			if ag.memdump != 0 {
 				let d: u32 = vm.cpu.memory.read(0);
 				println!("[Memory dump mode]");
 				println!("Address[{:08x}]: {:08x} ",0, d);
 
-				for i in 1..30 {
+				for i in 1..(ag.memdump / 4 + 1) {
 					let d: u32 = vm.cpu.memory.read(i*4);
 					println!("Address[{:08x}]: {:08x} ",0, d);
 				}
