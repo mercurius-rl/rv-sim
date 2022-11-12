@@ -5,3 +5,4 @@ sub a3 a2 a1
 addi a3 a3 1
 slli a4 a3 2
 sw a4 256(zero)
+halt
