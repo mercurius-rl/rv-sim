@@ -82,6 +82,38 @@ pub fn asm(path: &str, out: &str) {
     map.insert("t4", 29);
     map.insert("t5", 30);
     map.insert("t6", 31);
+    map.insert("x0", 0);
+    map.insert("x1", 1);
+    map.insert("x2", 2);
+    map.insert("x3", 3);
+    map.insert("x4", 4);
+    map.insert("x5", 5);
+    map.insert("x6", 6);
+    map.insert("x7", 7);
+    map.insert("x8", 8);
+    map.insert("x9", 9);
+    map.insert("x10", 10);
+    map.insert("x11", 11);
+    map.insert("x12", 12);
+    map.insert("x13", 13);
+    map.insert("x14", 14);
+    map.insert("x15", 15);
+    map.insert("x16", 16);
+    map.insert("x17", 17);
+    map.insert("x18", 18);
+    map.insert("x19", 19);
+    map.insert("x20", 20);
+    map.insert("x21", 21);
+    map.insert("x22", 22);
+    map.insert("x23", 23);
+    map.insert("x24", 24);
+    map.insert("x25", 25);
+    map.insert("x26", 26);
+    map.insert("x27", 27);
+    map.insert("x28", 28);
+    map.insert("x29", 29);
+    map.insert("x30", 30);
+    map.insert("x31", 31);
     let reg = map;
     
 
@@ -726,6 +758,108 @@ pub fn asm(path: &str, out: &str) {
                     let imm1: u32 = imm << 20;
 
                     let bin = imm1+rs1+funct3+rd+op;
+                    let s = format!("{:>08x}\n", bin);
+                    let f: &[u8] = s.as_bytes();
+                    writer.write_all(f);
+                }
+            },
+            "CSRRW" | "csrrw" => {
+                if reg.contains_key(sv[1]) && reg.contains_key(sv[3]) {
+                    let op: u32 = 0x73;
+                    let rd: u32 = reg[sv[1]] << 7;
+                    let rs1: u32 = reg[sv[3]] << 15;
+
+                    let funct3: u32 = 0x1 << 12;
+                    let c: u32 = sv[2].parse().unwrap();
+                    let csr: u32 = c << 20;
+
+                    let bin = csr+rs1+funct3+rd+op;
+                    let s = format!("{:>08x}\n", bin);
+                    let f: &[u8] = s.as_bytes();
+                    writer.write_all(f);
+                }
+            },
+            "CSRRS" | "csrrs" => {
+                if reg.contains_key(sv[1]) && reg.contains_key(sv[3]) {
+                    let op: u32 = 0x73;
+                    let rd: u32 = reg[sv[1]] << 7;
+                    let rs1: u32 = reg[sv[3]] << 15;
+
+                    let funct3: u32 = 0x2 << 12;
+                    let c: u32 = sv[2].parse().unwrap();
+                    let csr: u32 = c << 20;
+
+                    let bin = csr+rs1+funct3+rd+op;
+                    let s = format!("{:>08x}\n", bin);
+                    let f: &[u8] = s.as_bytes();
+                    writer.write_all(f);
+                }
+            },
+            "CSRRC" | "csrrc" => {
+                if reg.contains_key(sv[1]) && reg.contains_key(sv[3]) {
+                    let op: u32 = 0x73;
+                    let rd: u32 = reg[sv[1]] << 7;
+                    let rs1: u32 = reg[sv[3]] << 15;
+
+                    let funct3: u32 = 0x3 << 12;
+                    let c: u32 = sv[2].parse().unwrap();
+                    let csr: u32 = c << 20;
+
+                    let bin = csr+rs1+funct3+rd+op;
+                    let s = format!("{:>08x}\n", bin);
+                    let f: &[u8] = s.as_bytes();
+                    writer.write_all(f);
+                }
+            },
+            "CSRRWI" | "csrrwi" => {
+                if reg.contains_key(sv[1]) {
+                    let op: u32 = 0x73;
+                    let rd: u32 = reg[sv[1]] << 7;
+
+                    let i: u32 = sv[3].parse().unwrap();
+                    let imm: u32 = i << 15;
+
+                    let funct3: u32 = 0x5 << 12;
+                    let c: u32 = sv[2].parse().unwrap();
+                    let csr: u32 = c << 20;
+
+                    let bin = csr+imm+funct3+rd+op;
+                    let s = format!("{:>08x}\n", bin);
+                    let f: &[u8] = s.as_bytes();
+                    writer.write_all(f);
+                }
+            },
+            "CSRRSI" | "csrrsi" => {
+                if reg.contains_key(sv[1]) {
+                    let op: u32 = 0x73;
+                    let rd: u32 = reg[sv[1]] << 7; 
+
+                    let i: u32 = sv[3].parse().unwrap();
+                    let imm: u32 = i << 15;
+
+                    let funct3: u32 = 0x6 << 12;
+                    let c: u32 = sv[2].parse().unwrap();
+                    let csr: u32 = c << 20;
+
+                    let bin = csr+imm+funct3+rd+op;
+                    let s = format!("{:>08x}\n", bin);
+                    let f: &[u8] = s.as_bytes();
+                    writer.write_all(f);
+                }
+            },
+            "CSRRCI" | "csrrci" => {
+                if reg.contains_key(sv[1]) {
+                    let op: u32 = 0x73;
+                    let rd: u32 = reg[sv[1]] << 7;
+
+                    let i: u32 = sv[3].parse().unwrap();
+                    let imm: u32 = i << 15;
+
+                    let funct3: u32 = 0x7 << 12;
+                    let c: u32 = sv[2].parse().unwrap();
+                    let csr: u32 = c << 20;
+
+                    let bin = csr+imm+funct3+rd+op;
                     let s = format!("{:>08x}\n", bin);
                     let f: &[u8] = s.as_bytes();
                     writer.write_all(f);

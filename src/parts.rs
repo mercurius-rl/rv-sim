@@ -149,6 +149,62 @@ impl ReadWrite<u32> for Reg {
     }
 }
 
+// Control and Status Register implementation
+#[derive(Debug)]
+pub struct Csr {
+    mstatus : u32,
+    mie     : u32,
+    mtvec   : u32,
+    mepc    : u32,
+    mcause  : u32,
+    mtval   : u32,
+    mip     : u32,
+}
+
+impl Default for Csr {
+    fn default() -> Self {
+        Self {
+            mstatus : 0,
+            mie     : 0,
+            mtvec   : 0,
+            mepc    : 0,
+            mcause  : 0,
+            mtval   : 0,
+            mip     : 0,
+        }
+    }
+}
+
+impl ReadWrite<u32> for Csr {
+    fn write(&mut self, addr: u32, data: u32) {
+        match addr {
+            0x300 => {self.mstatus = data}
+            0x304 => {self.mie = data}
+            0x305 => {self.mtvec = data}
+            0x341 => {self.mepc = data}
+            0x342 => {self.mcause = data}
+            0x343 => {self.mtval = data}
+            0x344 => {self.mip = data}
+            _ =>{}
+        }
+    }
+
+    fn read(&self, addr: u32) -> u32 {
+        match addr {
+            0x300 => {self.mstatus},
+            0x304 => {self.mie},
+            0x305 => {self.mtvec},
+            0x341 => {self.mepc},
+            0x342 => {self.mcause},
+            0x343 => {self.mtval},
+            0x344 => {self.mip},
+            _ => 0
+        }
+    }
+}
+
+
+
 // Decoder implementation
 #[derive(Debug, PartialEq, Clone)]
 pub enum Instruction {
@@ -194,6 +250,13 @@ pub enum Instruction {
 
     Jal  {rd: u32, off: u32},
     Jalr {rd: u32, rs1: u32, off: u32},
+
+    Csrrw{rd: u32, csr: u32, rs1: u32},
+    Csrrs{rd: u32, csr: u32, rs1: u32},
+    Csrrc{rd: u32, csr: u32, rs1: u32},
+    Csrrwi{rd: u32, csr: u32, imm: u32},
+    Csrrsi{rd: u32, csr: u32, imm: u32},
+    Csrrci{rd: u32, csr: u32, imm: u32},
 
     Nop,
     Halt,
@@ -328,6 +391,23 @@ impl Instruction {
                 Ok(Instruction::Jalr{rd, rs1, off})
             },
 
+            //csr
+            0b1110011 => {
+                let csr = (inst & 0xFE000000) >> 20;
+
+                match funct3 {
+                    0x0 => Ok(Instruction::Csrrw{rd, csr, rs1}),
+                    0x1 => Ok(Instruction::Csrrs{rd, csr, rs1}),
+                    0x2 => Ok(Instruction::Csrrc{rd, csr, rs1}),
+
+                    0x5 => Ok(Instruction::Csrrwi{rd, csr, imm:rs1}),
+                    0x6 => Ok(Instruction::Csrrsi{rd, csr, imm:rs1}),
+                    0x7 => Ok(Instruction::Csrrci{rd, csr, imm:rs1}),
+                    
+                    _ => Ok(Instruction::Nop),
+                }
+            }
+
             // HALT
             0b1111111 => {
                 Ok(Instruction::Halt)
@@ -340,6 +420,7 @@ impl Instruction {
 pub struct CPU {
     pub pc: u32,
     pub rf: Reg,
+    pub csr: Csr,
     pub memory: Memory,
 }
 
@@ -661,6 +742,52 @@ impl CPU {
                 Result::Ok(())
             },
 
+            Instruction::Csrrw{rd, csr, rs1} => {
+                let t = self.csr.read(csr);
+                let s: u32 = self.rf.read(rs1);
+                self.csr.write(csr, s); 
+                self.rf.write(rd, t);
+                self.pc += 4;
+                Result::Ok(())
+            },
+            Instruction::Csrrs{rd, csr, rs1} => {
+                let t = self.csr.read(csr);
+                let s: u32 = self.rf.read(rs1);
+                self.csr.write(csr, t | s); 
+                self.rf.write(rd, t);
+                self.pc += 4;
+                Result::Ok(())
+            },
+            Instruction::Csrrc{rd, csr, rs1} => {
+                let t = self.csr.read(csr);
+                let s: u32 = self.rf.read(rs1);
+                self.csr.write(csr, t & !s); 
+                self.rf.write(rd, t);
+                self.pc += 4;
+                Result::Ok(())
+            },
+            Instruction::Csrrwi{rd, csr, imm} => {
+                let t = self.csr.read(csr);
+                self.csr.write(csr, imm); 
+                self.rf.write(rd, t);
+                self.pc += 4;
+                Result::Ok(())
+            },
+            Instruction::Csrrsi{rd, csr, imm} => {
+                let t = self.csr.read(csr);
+                self.csr.write(csr, t | imm); 
+                self.rf.write(rd, t);
+                self.pc += 4;
+                Result::Ok(())
+            },
+            Instruction::Csrrci{rd, csr, imm} => {
+                let t = self.csr.read(csr);
+                self.csr.write(csr, t & !imm); 
+                self.rf.write(rd, t);
+                self.pc += 4;
+                Result::Ok(())
+            },
+
             Instruction::Nop => {
                 self.pc += 4;
                 Result::Ok(())
@@ -698,6 +825,7 @@ impl VMachine {
             cpu: CPU{
                 pc: 0,
                 rf: Reg::default(),
+                csr: Csr::default(),
                 memory: Memory::size(size),
             }
         }
