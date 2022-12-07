@@ -54,6 +54,12 @@ blt
 bge
 bltu
 bgeu
+csrrw
+csrrs
+csrrc
+csrrwi
+csrrsi
+csrrci
 ```
 
 Sample
