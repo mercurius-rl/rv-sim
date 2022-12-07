@@ -116,3 +116,4 @@ Update history
 2022/07/13:  Development started in Youtube broadcast.  
 2022/11/09:  Implemented Simulator and Assembler function.  
 2022/11/13:  First commit version 0.1.  
+2022/12/07:  Implement CSR instruction.  
