@@ -34,6 +34,10 @@ struct Args {
 	/// memory dump (dump length)
 	#[argh(option, short = 'm', default = "0")]
 	memdump: u32,
+
+	/// count of maximum instruction execute
+	#[argh(option, short = 'c', default = "256")]
+	ex_count: i32,
 }
 
 fn main() {
@@ -49,9 +53,9 @@ fn main() {
 
 		vm.cpu.binread(&ag.bin);
 		if ag.dbg {
-			vm.start_dbg();
+			vm.start_dbg(ag.ex_count);
 		} else {
-			vm.start();
+			vm.start(ag.ex_count);
 		}
 
 		if ag.memdump != 0 {
@@ -74,9 +78,9 @@ fn main() {
 
 			vm.cpu.binread(&ag.bin);
 			if ag.dbg {
-				vm.start_dbg();
+				vm.start_dbg(ag.ex_count);
 			} else {
-				vm.start();
+				vm.start(ag.ex_count);
 			}
 
 			if ag.memdump != 0 {

@@ -91,7 +91,7 @@ halt
 Execution
 ======================================
 ```
-cargo run "asm source file" "Options"
+cargo run <asm source file> <Options>*
 ```
 
 ```
@@ -105,6 +105,8 @@ Options:
   -b, --bin         binary data file
   -d, --dbg         debug run
   -m, --memdump     memory dump (dump length)
+  -c, --ex_count    count of maximum instruction execute
+                    (default: 256)  if you want setting infinity count, set negative number for this parameter.
   --help            display usage information
 ```
 
@@ -117,9 +119,42 @@ or
 cargo run test.asm -d -m 256
 ```
 
+How to read debug output
+======================================
+
+```
+--Output of debug run--
+*When -d or --dbg is set.*
+
+Address[**addr**]: **binInst** (**inst** { **operand** })
+reg: Reg { f: [**rfData**] }
+
+addr    : Instruction memory address during read instruction.
+binInst : Instruction binary.
+inst    : Instruction name.
+operand : inst's operand.
+rfData  : Data stored in the register file.
+```
+
+```
+--Output of memory dump--
+*When -m or --memdump is set.*
+
+[Memory dump mode]
+Address[**maddr**   ]: **bin**
+Address[**maddr** +1]: **bin**
+・
+・
+・
+
+maddr   : Data memory address.
+bin     : Data binary.
+```
+
 Update history
 ======================================
 2022/07/13:  Development started in Youtube broadcast.  
 2022/11/09:  Implemented Simulator and Assembler function.  
 2022/11/13:  First commit version 0.1.  
-2022/12/07:  Implement CSR instruction.  
+2022/12/07:  Implemented CSR instruction. 
+2023/04/15:  Implemented the setting of maximum execution count. 
