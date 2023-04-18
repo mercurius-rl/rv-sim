@@ -156,5 +156,5 @@ Update history
 2022/07/13:  Development started in Youtube broadcast.  
 2022/11/09:  Implemented Simulator and Assembler function.  
 2022/11/13:  First commit version 0.1.  
-2022/12/07:  Implemented CSR instruction. 
-2023/04/15:  Implemented the setting of maximum execution count. 
+2022/12/07:  Implemented CSR instruction.  
+2023/04/15:  Implemented the setting of maximum execution count.  
