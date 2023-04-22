@@ -258,6 +258,15 @@ pub enum Instruction {
 	Csrrsi{rd: u32, csr: u32, imm: u32},
 	Csrrci{rd: u32, csr: u32, imm: u32},
 
+	Mul   {rd: u32, rs1: u32, rs2: u32},
+	Mulh  {rd: u32, rs1: u32, rs2: u32},
+	Mulhsu{rd: u32, rs1: u32, rs2: u32},
+	Mulhu {rd: u32, rs1: u32, rs2: u32},
+	Div   {rd: u32, rs1: u32, rs2: u32},
+	Divu  {rd: u32, rs1: u32, rs2: u32},
+	Rem   {rd: u32, rs1: u32, rs2: u32},
+	Remu  {rd: u32, rs1: u32, rs2: u32},
+
 	Nop,
 	Halt,
 }
@@ -319,24 +328,41 @@ impl Instruction {
 
 			// R-Type
 			0b0110011 => {
-				match funct3 {
-					0x0 => match funct7 {
-						0x20 => Ok(Instruction::Sub{rd, rs1, rs2}),
-						0x00 => Ok(Instruction::Add{rd, rs1, rs2}),
-						_ => Ok(Instruction::Nop),
+				match funct7 {
+					0b0000001 => {
+						match funct3 {
+							0x0 => Ok(Instruction::Mul{rd, rs1, rs2}),
+							0x1 => Ok(Instruction::Mulh{rd, rs1, rs2}),
+							0x2 => Ok(Instruction::Mulhsu{rd, rs1, rs2}),
+							0x3 => Ok(Instruction::Mulhu{rd, rs1, rs2}),
+							0x4 => Ok(Instruction::Div{rd, rs1, rs2}),
+							0x5 => Ok(Instruction::Divu{rd, rs1, rs2}),
+							0x6 => Ok(Instruction::Rem{rd, rs1, rs2}),
+							0x7 => Ok(Instruction::Remu{rd, rs1, rs2}),
+							_ => Ok(Instruction::Nop),
+						}
 					},
-					0x1 => Ok(Instruction::Sll{rd, rs1, rs2}),
-					0x2 => Ok(Instruction::Slt{rd, rs1, rs2}),
-					0x3 => Ok(Instruction::Sltu{rd, rs1, rs2}),
-					0x4 => Ok(Instruction::Xor{rd, rs1, rs2}),
-					0x5 => match funct7 {
-						0x20 => Ok(Instruction::Sra{rd, rs1, rs2}),
-						0x00 => Ok(Instruction::Srl{rd, rs1, rs2}),
-						_ => Ok(Instruction::Nop),
-					},
-					0x6 => Ok(Instruction::Or{rd, rs1, rs2}),
-					0x7 => Ok(Instruction::And{rd, rs1, rs2}),
-					_ => Ok(Instruction::Nop),
+					_ => {
+						match funct3 {
+							0x0 => match funct7 {
+								0x20 => Ok(Instruction::Sub{rd, rs1, rs2}),
+								0x00 => Ok(Instruction::Add{rd, rs1, rs2}),
+								_ => Ok(Instruction::Nop),
+							},
+							0x1 => Ok(Instruction::Sll{rd, rs1, rs2}),
+							0x2 => Ok(Instruction::Slt{rd, rs1, rs2}),
+							0x3 => Ok(Instruction::Sltu{rd, rs1, rs2}),
+							0x4 => Ok(Instruction::Xor{rd, rs1, rs2}),
+							0x5 => match funct7 {
+								0x20 => Ok(Instruction::Sra{rd, rs1, rs2}),
+								0x00 => Ok(Instruction::Srl{rd, rs1, rs2}),
+								_ => Ok(Instruction::Nop),
+							},
+							0x6 => Ok(Instruction::Or{rd, rs1, rs2}),
+							0x7 => Ok(Instruction::And{rd, rs1, rs2}),
+							_ => Ok(Instruction::Nop),
+						}
+					}
 				}
 			},
 
@@ -788,6 +814,67 @@ impl CPU {
 				Result::Ok(())
 			},
 
+			Instruction::Mul{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: u64 = (r1 as u64) * (r2 as u64);
+				let value32: u32 = value as u32;
+				self.rf.write(rd, value32);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Mulh{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: i64 = (r1 as i64) * (r2 as i64);
+				let value32: u32 = (value >> 32) as u32;
+				self.rf.write(rd, value32);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Mulhsu{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: i64 = (r1 as i64) * (r2 as i64);
+				let value32: u32 = (value >> 32) as u32;
+				self.rf.write(rd, value32);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Mulhu{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: u64 = (r1 as u64) * (r2 as u64);
+				let value32: u32 = (value >> 32) as u32;
+				self.rf.write(rd, value32);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Div{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: i32 = (r1 as i32) / (r2 as i32);
+				self.rf.write(rd, value as u32);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Divu{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: u32 = r1 / r2;
+				self.rf.write(rd, value);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Rem{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: i32 = (r1 as i32) % (r2 as i32);
+				self.rf.write(rd, value as u32);
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Remu{rd, rs1, rs2} => {
+				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
+				let value: u32 = r1 % r2;
+				self.rf.write(rd, value);
+				self.pc += 4;
+				Result::Ok(())
+			},
+
 			Instruction::Nop => {
 				self.pc += 4;
 				Result::Ok(())
@@ -843,7 +930,7 @@ impl VMachine {
 				}
 			}
 			self.icount += 1;
-			if (self.icount == ic) {
+			if self.icount == ic {
 				println!("Maximum run cycle reached: {}.\nStop the RISC-V Core sim", ic);
 				return;
 			}
@@ -864,7 +951,7 @@ impl VMachine {
 				}
 			}
 			self.icount += 1;
-			if (self.icount == ic) {
+			if self.icount == ic {
 				println!("Maximum run cycle reached: {}.\nStop the RISC-V Core sim", ic);
 				return;
 			}

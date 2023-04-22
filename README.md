@@ -1,10 +1,10 @@
 RISC-V Simulator written in Rust lang
 ===============================
 
-- ver.0.1
+- ver.0.2
 
 This is a simple RISC-V simulator and RISC-V Assembler tools.
-This simulator supports executing part of RV32I.
+This simulator supports executing part of RV32IM.
 
 License
 ========================================
@@ -60,6 +60,15 @@ csrrc
 csrrwi
 csrrsi
 csrrci
+
+mul
+mulh
+mulhsu
+mulhu
+div
+divu
+rem
+remu
 ```
 
 Sample
@@ -158,3 +167,4 @@ Update history
 2022/11/13:  First commit version 0.1.  
 2022/12/07:  Implemented CSR instruction.  
 2023/04/15:  Implemented the setting of maximum execution count.  
+2023/04/22:  Implemented Multiplicaton instruction.  
