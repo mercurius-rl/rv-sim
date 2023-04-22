@@ -996,13 +996,13 @@ pub fn asm(path: &str, out: &str) {
 			},
 
 			"NOP" | "nop" => {
-				let op: u32 = 0x33;
+				let op: u32 = 0x13;
 				let rd: u32 = 0 << 7;
 				let rs1: u32 = 0 << 15;
-				let rs2: u32 = 0 << 20;
-				let funct3: u32 = 0x5 << 12;
-				let funct7: u32 = 0x0 << 25;
-				let bin = funct7+rs2+rs1+funct3+rd+op;
+
+				let funct3: u32 = 0x0 << 12;
+				let imm: u32 = 0x0 << 20;
+				let bin = imm+rs1+funct3+rd+op;
 				let s = format!("{:>08x}\n", bin);
 					let f: &[u8] = s.as_bytes();
 					writer.write_all(f);

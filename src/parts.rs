@@ -297,7 +297,13 @@ impl Instruction {
 				let imm = (inst & 0xFFF00000) >> 20;
 
 				match funct3 {
-					0x0 => Ok(Instruction::Addi{rd, rs1, imm}),
+					0x0 => {
+						if rd == 0 && rs1 == 0 && imm == 0 {
+							Ok(Instruction::Nop)
+						} else {
+							Ok(Instruction::Addi{rd, rs1, imm})
+						}
+					},
 					0x1 => Ok(Instruction::Slli{rd, rs1, imm}),
 					0x2 => Ok(Instruction::Slti{rd, rs1, imm}),
 					0x3 => Ok(Instruction::Sltiu{rd, rs1, imm}),
