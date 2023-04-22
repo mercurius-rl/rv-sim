@@ -71,6 +71,42 @@ rem
 remu
 ```
 
+### Available register names
+```
+ 0: "zero" or "x0"
+ 1: "ra" or "x1"
+ 2: "sp" or "x2"
+ 3: "gp" or "x3"
+ 4: "tp" or "x4"
+ 5: "t0" or "x5"
+ 6: "t1" or "x6"
+ 7: "t2" or "x7"
+ 8: "fp" or "s0" or "x8"
+ 9: "s1" or "x9"
+10: "a0" or "x10"
+11: "a1" or "x11"
+12: "a2" or "x12"
+13: "a3" or "x13"
+14: "a4" or "x14"
+15: "a5" or "x15"
+16: "a6" or "x16"
+17: "a7" or "x17"
+18: "s2" or "x18"
+19: "s3" or "x19"
+20: "s4" or "x20"
+21: "s5" or "x21"
+22: "s6" or "x22"
+23: "s7" or "x23"
+24: "s8" or "x24"
+25: "s9" or "x25"
+26: "s10" or "x26"
+27: "s11" or "x27"
+28: "t3" or "x28"
+29: "t4" or "x29"
+30: "t5" or "x30"
+31: "t6" or "x31"
+``` 
+
 Sample
 ======================================
 
