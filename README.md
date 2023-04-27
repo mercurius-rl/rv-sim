@@ -123,13 +123,13 @@ Asm code to perform the above calculation and store it in memory at address 0x10
 ```m68k:sample.asm
 *code block 1*
 
-addi a0 zero 2
-addi a1 a0 3
-addi a2 zero 10
-sub a3 a2 a1
-addi a3 a3 1
-slli a4 a3 2
-sw a4 256(zero)
+addi a0,zero,2
+addi a1,a0,3
+addi a2,zero,10
+sub a3,a2,a1
+addi a3,a3,1
+slli a4,a3,2
+sw a4,256(zero)
 halt
 ```
 
@@ -204,3 +204,4 @@ Update history
 2022/12/07:  Implemented CSR instruction.  
 2023/04/15:  Implemented the setting of maximum execution count.  
 2023/04/22:  Implemented Multiplicaton instruction.  
+2023/04/27:  Fixed assembler parser and sample code.  
