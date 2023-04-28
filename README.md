@@ -1,7 +1,7 @@
 RISC-V Simulator written in Rust lang
 ===============================
 
-- ver.0.2
+- ver.0.3
 
 This is a simple RISC-V simulator and RISC-V Assembler tools.
 This simulator supports executing part of RV32IM.
@@ -196,6 +196,23 @@ maddr   : Data memory address.
 bin     : Data binary.
 ```
 
+## Interactive mode (Beta)
+If you run without arguments, interactive mode starts.  
+There is a dedicated command for interactive mode.
+```
+.info   : Show register's data.
+
+.exit   : Exit interactive mode.
+
+.faddr  : Executes the instruction in instruction memory 
+          pointed to by the current program counter.
+
+.addr++ : Increment the program counter.
+
+.addr-- : Decrement the program counter.
+          (However, when the value of the program counter is 4 or more)
+```
+
 Update history
 ======================================
 2022/07/13:  Development started in Youtube broadcast.  
@@ -203,5 +220,6 @@ Update history
 2022/11/13:  First commit version 0.1.  
 2022/12/07:  Implemented CSR instruction.  
 2023/04/15:  Implemented the setting of maximum execution count.  
-2023/04/22:  Implemented Multiplicaton instruction.  
+2023/04/22:  Implemented Multiplicaton instruction (ver. 0.2).  
 2023/04/27:  Fixed assembler parser and sample code.  
+2023/04/29:  Add and Implement Interactive mode(Beta, ver. 0.3).  

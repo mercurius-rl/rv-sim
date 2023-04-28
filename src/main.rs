@@ -4,12 +4,32 @@ mod asm_f;
 use parts::*;
 use argh::FromArgs;
 
+use crate::asm_f::one_line_asm;
+
+static VERSION: &str = "v0.2";
+static BUILDTIME: &str = "April 27 2023";
+
+#[cfg(target_os = "windows")]
+fn show_platform() -> String {
+	"Windows".to_string()
+}
+
+#[cfg(target_os = "macos")]
+fn show_platform() -> String {
+	"MacOS".to_string()
+}
+
+#[cfg(target_os = "linux")]
+fn show_platform() -> String {
+	"Linux".to_string()
+}
+
 #[derive(FromArgs)]
 /// Reach new heights.
 struct Args {
 
 	#[argh(positional)]
-    src: String,
+    src: Vec<String>,
 
 	/// run assembler
 	#[argh(switch, short = 'a')]
@@ -40,15 +60,73 @@ struct Args {
 	ex_count: i32,
 }
 
+fn interactive_run () {
+	let mut itrvm = VMachine::new(1024);
+	println!("...run RISC-V Interactive mode.");
+	loop {
+		let pc = itrvm.cpu.pc;
+		print!("*:{} >>> ", pc);
+		let mut buffer = String::new();
+		std::io::stdin().read_line(&mut buffer).ok();
+		buffer = buffer.lines().collect::<String>();
+
+		println!("{}",buffer);
+
+		match buffer.as_str() {
+			".info" => {
+				println!("reg: {:?}", itrvm.cpu.rf);
+			},
+			".exit" => {
+				println!("end...");
+				return;
+			},
+			".faddr" => {
+				if let Err(_) = itrvm.cpu.run() {
+					println!("Executed HALT");
+					println!("end...");
+					return;
+				}
+			},
+			".addr++" => {
+				itrvm.cpu.pc += 4;
+			},
+			".addr--" => {
+				if itrvm.cpu.pc >= 4 {
+					itrvm.cpu.pc -= 4;
+				}
+			},
+			_ => {
+				let st = one_line_asm(&buffer);
+				itrvm.cpu.memory.write(pc, st);
+				if let Ok(a) = Instruction::decode(st){
+					let s = itrvm.cpu.execute(a);
+					if let Err(_) = s {
+						println!("Executed HALT");
+						println!("end...");
+						return;
+					}
+				}
+			}
+		}
+	}
+}
+
 fn main() {
 	let mut ag: Args = argh::from_env();
+
+	println!("RISC-V ASM Sim {} ({}) on {}", VERSION, BUILDTIME, show_platform());
+
+	if ag.src.len() == 0 {
+		interactive_run();
+		return;
+	}
 
 	if ag.asm == ag.sim {
 		if ag.output != ag.bin {
 			println!("Fixed binary data path...");
 			ag.output = ag.bin.clone();
 		}
-		asm_f::asm(&ag.src, &ag.output);
+		asm_f::asm(&ag.src[0], &ag.output);
 		let mut vm = VMachine::new(1024);
 
 		vm.cpu.binread(&ag.bin);
@@ -70,7 +148,7 @@ fn main() {
 		}
 	} else {
 		if ag.asm {
-			asm_f::asm(&ag.src, &ag.output);
+			asm_f::asm(&ag.src[0], &ag.output);
 		}
 
 		if ag.sim {
