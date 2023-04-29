@@ -7,7 +7,7 @@ use argh::FromArgs;
 use crate::asm_f::one_line_asm;
 
 static VERSION: &str = "v0.2";
-static BUILDTIME: &str = "April 27 2023";
+static UPDATETIME: &str = "April 29 2023";
 
 #[cfg(target_os = "windows")]
 fn show_platform() -> String {
@@ -114,7 +114,7 @@ fn interactive_run () {
 fn main() {
 	let mut ag: Args = argh::from_env();
 
-	println!("RISC-V ASM Sim {} ({}) on {}", VERSION, BUILDTIME, show_platform());
+	println!("RISC-V ASM Sim {} ({}) on {}", VERSION, UPDATETIME, show_platform());
 
 	if ag.src.len() == 0 {
 		interactive_run();
