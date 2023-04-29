@@ -1,7 +1,11 @@
+extern crate regex;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
 use std::io::prelude::*;
+
+use regex::Regex;
 
 pub fn one_line_asm(line: &str) -> u32 {
 	let mut map = HashMap::new();
@@ -1135,9 +1139,16 @@ pub fn asm(path: &str, out: &str) {
 	map.insert("x31", 31);
 	let reg = map;
 	
-
+	let re = Regex::new(r"\ *#.*").unwrap();
 	for line in reader.lines() {
-		let line = line.unwrap();
+		let rline = line.unwrap();
+		#[allow(unused_assignments)]
+		let mut line: String = String::new();
+		if let Some(caps) = re.captures(&rline) {
+			line = rline.replace(caps.get(0).unwrap().as_str(), "");
+		} else {
+			line = rline;
+		}
 
 		let spl: Vec<&str> = line.split(' ').collect();
 		let mut sv: Vec<&str> = vec![spl[0]];
