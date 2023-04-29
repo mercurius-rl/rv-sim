@@ -116,7 +116,9 @@ impl Default for Reg {
 impl ReadWrite<u8> for Reg {
 	fn write(&mut self, addr: u32, data: u8) {
 		let index = addr as usize;
-		self.f[index] = (self.f[index] & 0x000000FF) | data as u32;
+		if addr != 0 {
+			self.f[index] = (self.f[index] & 0x000000FF) | data as u32;
+		}
 	}
 
 	fn read(&self, addr: u32) -> u8 {
@@ -128,7 +130,9 @@ impl ReadWrite<u8> for Reg {
 impl ReadWrite<u16> for Reg {
 	fn write(&mut self, addr: u32, data: u16) {
 		let index = addr as usize;
-		self.f[index] = (self.f[index] & 0x0000FFFF) | data as u32;
+		if addr != 0 {
+			self.f[index] = (self.f[index] & 0x0000FFFF) | data as u32;
+		}
 	}
 
 	fn read(&self, addr: u32) -> u16 {
@@ -140,7 +144,9 @@ impl ReadWrite<u16> for Reg {
 impl ReadWrite<u32> for Reg {
 	fn write(&mut self, addr: u32, data: u32) {
 		let index = addr as usize;
-		self.f[index] = data;
+		if addr != 0 {
+			self.f[index] = data;
+		}
 	}
 
 	fn read(&self, addr: u32) -> u32 {
