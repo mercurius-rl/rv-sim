@@ -653,6 +653,8 @@ impl CPU {
 				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
 				if r1 == r2 {
 					self.pc += off;
+				} else {
+					self.pc += 4;
 				}
 				Result::Ok(())
 			},
@@ -660,6 +662,8 @@ impl CPU {
 				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
 				if r1 != r2 {
 					self.pc += off;
+				} else {
+					self.pc += 4;
 				}
 				Result::Ok(())
 			},
@@ -667,6 +671,8 @@ impl CPU {
 				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
 				if (r1 as i32) < (r2 as i32) {
 					self.pc += off;
+				} else {
+					self.pc += 4;
 				}
 				Result::Ok(())
 			},
@@ -674,6 +680,8 @@ impl CPU {
 				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
 				if (r1 as i32) >= (r2 as i32) {
 					self.pc += off;
+				} else {
+					self.pc += 4;
 				}
 				Result::Ok(())
 			},
@@ -681,6 +689,8 @@ impl CPU {
 				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
 				if r1 < r2  {
 					self.pc += off;
+				} else {
+					self.pc += 4;
 				}
 				Result::Ok(())
 			},
@@ -688,6 +698,8 @@ impl CPU {
 				let (r1, r2): (u32,u32) = (self.rf.read(rs1), self.rf.read(rs2)); 
 				if r1 >= r2 {
 					self.pc += off;
+				} else {
+					self.pc += 4;
 				}
 				Result::Ok(())
 			},
