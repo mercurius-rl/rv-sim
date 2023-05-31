@@ -1,7 +1,7 @@
 RISC-V Simulator written in Rust lang
 ===============================
 
-- ver.0.3
+- ver.0.4
 
 This is a simple RISC-V simulator and RISC-V Assembler tools.
 This simulator supports executing part of RV32IM.
@@ -223,3 +223,4 @@ Update history
 2023/04/22:  Implemented Multiplicaton instruction (ver. 0.2).  
 2023/04/27:  Fixed assembler parser and sample code.  
 2023/04/29:  Add and Implement Interactive mode(Beta, ver. 0.3).  
+2023/05/31:  Add library api.  
