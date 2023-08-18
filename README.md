@@ -61,6 +61,13 @@ csrrwi
 csrrsi
 csrrci
 
+ecall
+ebreak
+
+uret
+sret
+mret
+
 mul
 mulh
 mulhsu
