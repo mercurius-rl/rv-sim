@@ -866,6 +866,23 @@ pub fn one_line_asm(line: &str) -> u32 {
 				bin
 			}
 		},
+		
+		"ECALL" | "ecall" => {
+			0x00000073 as u32
+		},
+		"EBREAK" | "ebreak" => {
+			0x00100073 as u32
+		},
+
+		"URET" | "uret" => {
+			0x00200073 as u32
+		},
+		"SRET" | "sret" => {
+			0x10200073 as u32
+		},
+		"MRET" | "mret" => {
+			0x20200073 as u32
+		},
 
 		"MUL" | "mul" => {
 			if reg.contains_key(sv[1]) && reg.contains_key(sv[2]) && reg.contains_key(sv[3]) {

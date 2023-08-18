@@ -191,7 +191,7 @@ impl ReadWrite<u32> for Csr {
 			0x342 => {self.mcause = data}
 			0x343 => {self.mtval = data}
 			0x344 => {self.mip = data}
-			_ =>{}
+			_ => {}
 		}
 	}
 
@@ -256,6 +256,13 @@ pub enum Instruction {
 
 	Jal  {rd: u32, off: u32},
 	Jalr {rd: u32, rs1: u32, off: u32},
+
+	Ecall,
+	Ebreak,
+
+	Uret ,
+	Sret ,
+	Mret ,
 
 	Csrrw{rd: u32, csr: u32, rs1: u32},
 	Csrrs{rd: u32, csr: u32, rs1: u32},
@@ -434,9 +441,21 @@ impl Instruction {
 				let csr = (inst & 0xFE000000) >> 20;
 
 				match funct3 {
-					0x0 => Ok(Instruction::Csrrw{rd, csr, rs1}),
-					0x1 => Ok(Instruction::Csrrs{rd, csr, rs1}),
-					0x2 => Ok(Instruction::Csrrc{rd, csr, rs1}),
+					0x0 => match rs2 {
+						0x0 => Ok(Instruction::Ecall{}),
+						0x1 => Ok(Instruction::Ebreak{}),
+						0x2 => match funct7 {
+							0x0 => Ok(Instruction::Uret{}),
+							0x8 => Ok(Instruction::Sret{}),
+							0x18=> Ok(Instruction::Mret{}),
+							_ => Ok(Instruction::Nop),
+						},
+						_ => Ok(Instruction::Nop),
+					}
+
+					0x1 => Ok(Instruction::Csrrw{rd, csr, rs1}),
+					0x2 => Ok(Instruction::Csrrs{rd, csr, rs1}),
+					0x3 => Ok(Instruction::Csrrc{rd, csr, rs1}),
 
 					0x5 => Ok(Instruction::Csrrwi{rd, csr, imm:rs1}),
 					0x6 => Ok(Instruction::Csrrsi{rd, csr, imm:rs1}),
@@ -835,6 +854,32 @@ impl CPU {
 				self.csr.write(csr, t & !imm); 
 				self.rf.write(rd, t);
 				self.pc += 4;
+				Result::Ok(())
+			},
+
+			Instruction::Ecall | Instruction::Ebreak => {
+				self.csr.write(0x341, self.pc + 4);
+				self.csr.write(0x342, 0x8000000b);
+				self.csr.write(0x343, self.pc + 4);
+
+				let mst = self.csr.read(0x300);
+				let mut status = (0x3 << 11) + ((mst & 0x8) << 4);
+				let b = mst & 0xFFFFFF77;
+				status = b | status;
+				self.csr.write(0x300, status);
+
+				self.pc = self.csr.read(0x305);
+				Result::Ok(())
+			},
+
+			Instruction::Uret | Instruction::Sret | Instruction::Mret => {
+				let mst = self.csr.read(0x300);
+				let mut status = (mst & 0x80) >> 4;
+				let b = mst & 0xFFFFF377;
+				status = b | status;
+				self.csr.write(0x300, status);
+
+				self.pc = self.csr.read(0x341);
 				Result::Ok(())
 			},
 
