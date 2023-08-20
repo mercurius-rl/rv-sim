@@ -54,6 +54,10 @@ blt
 bge
 bltu
 bgeu
+
+fence
+fence.i
+
 csrrw
 csrrs
 csrrc
