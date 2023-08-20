@@ -264,6 +264,9 @@ pub enum Instruction {
 	Sret ,
 	Mret ,
 
+	Fence{pred: u32, succ: u32},
+	Fencei,
+
 	Csrrw{rd: u32, csr: u32, rs1: u32},
 	Csrrs{rd: u32, csr: u32, rs1: u32},
 	Csrrc{rd: u32, csr: u32, rs1: u32},
@@ -436,18 +439,29 @@ impl Instruction {
 				Ok(Instruction::Jalr{rd, rs1, off})
 			},
 
+			0b0001111 => {
+				if funct3 == 0x1 {
+					Ok(Instruction::Fencei)
+				} else {
+					let pred: u32 = (inst & 0x0F000000) >> 24;
+					let succ: u32 = (inst & 0x00F00000) >> 20;
+
+					Ok(Instruction::Fence{pred, succ})
+				}
+			}
+
 			//csr
 			0b1110011 => {
 				let csr = (inst & 0xFE000000) >> 20;
 
 				match funct3 {
 					0x0 => match rs2 {
-						0x0 => Ok(Instruction::Ecall{}),
-						0x1 => Ok(Instruction::Ebreak{}),
+						0x0 => Ok(Instruction::Ecall),
+						0x1 => Ok(Instruction::Ebreak),
 						0x2 => match funct7 {
-							0x0 => Ok(Instruction::Uret{}),
-							0x8 => Ok(Instruction::Sret{}),
-							0x18=> Ok(Instruction::Mret{}),
+							0x0 => Ok(Instruction::Uret),
+							0x8 => Ok(Instruction::Sret),
+							0x18=> Ok(Instruction::Mret),
 							_ => Ok(Instruction::Nop),
 						},
 						_ => Ok(Instruction::Nop),
@@ -810,6 +824,16 @@ impl CPU {
 				self.pc = doff + off;
 				Result::Ok(())
 			},
+
+			#[allow(unused_variables)]
+			Instruction::Fence{pred, succ} => {
+				self.pc += 4;
+				Result::Ok(())
+			},
+			Instruction::Fencei => {
+				self.pc += 4;
+				Result::Ok(())
+			}
 
 			Instruction::Csrrw{rd, csr, rs1} => {
 				let t = self.csr.read(csr);

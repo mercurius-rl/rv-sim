@@ -232,3 +232,4 @@ Update history
 2023/04/29:  Add and Implement Interactive mode(Beta, ver. 0.3).  
 2023/05/31:  Add library api.  
 2023/08/19:  Add ecall, ebreak and (u s m)ret instruction.  
+2023/08/20:  Add fence, fence.i instruction (However, it doesn't work).  

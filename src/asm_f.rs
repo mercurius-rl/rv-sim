@@ -884,6 +884,18 @@ pub fn one_line_asm(line: &str) -> u32 {
 			0x20200073 as u32
 		},
 
+		"FENCE" | "fence" => {
+			let pred: u32 = sv[1].parse().expect("pred parameter can't be parse to numerical.");
+			let succ: u32 = sv[2].parse().expect("succ parameter can't be parse to numerical.");
+
+			let bin: u32 = 0x0000000F + ((pred & 0xF) << 24) + ((succ & 0xF) << 20);
+			bin
+		},
+
+		"FENCE.I" | "fence.i" => {
+			0x0000100F as u32
+		}
+
 		"MUL" | "mul" => {
 			if reg.contains_key(sv[1]) && reg.contains_key(sv[2]) && reg.contains_key(sv[3]) {
 				let op: u32 = 0x33;
