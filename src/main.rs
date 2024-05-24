@@ -6,8 +6,8 @@ use argh::FromArgs;
 
 use crate::asm_f::one_line_asm;
 
-static VERSION: &str = "v0.2";
-static UPDATETIME: &str = "April 29 2023";
+static VERSION: &str = "v0.4 Beta";
+static UPDATETIME: &str = "May 24 2024";
 
 #[cfg(target_os = "windows")]
 fn show_platform() -> String {
@@ -72,7 +72,9 @@ fn interactive_run () {
 
 		println!("{}",buffer);
 
-		match buffer.as_str() {
+		let sp: Vec<&str> = buffer.split_whitespace().collect();
+
+		match sp[0] {
 			".info" => {
 				println!("reg: {:?}", itrvm.cpu.rf);
 			},
@@ -95,6 +97,27 @@ fn interactive_run () {
 					itrvm.cpu.pc -= 4;
 				}
 			},
+			".show" => {
+				if sp.len() == 1 {
+					println!("No option.")
+				} else {
+					let d = itrvm.cpu.memory.read(pc);
+					match sp[1] {
+						"i" => {
+							println!("Address[{:08x}]: {:08x} ({:?})", itrvm.cpu.pc, d, Instruction::decode(d).unwrap());
+						},
+						"d" => {
+							println!("Address[{:08x}]: {:08x}", itrvm.cpu.pc, d);
+						},
+						"b" => {
+							println!("Address[{:08x}]: {:032b}", itrvm.cpu.pc, d);
+						},
+						_ => {
+							println!("Wrong option.")
+						}
+					}
+				}
+			}
 			_ => {
 				let st = one_line_asm(&buffer);
 				itrvm.cpu.memory.write(pc, st);

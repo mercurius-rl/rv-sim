@@ -222,6 +222,12 @@ There is a dedicated command for interactive mode.
 
 .addr-- : Decrement the program counter.
           (However, when the value of the program counter is 4 or more)
+
+.show   : Show several data.  
+          Option:  
+            i -- show current memory instruction information.
+            d -- show current memory data.
+            b -- show current memory data(binary) 
 ```
 
 Update history
@@ -237,3 +243,4 @@ Update history
 2023/05/31:  Add library api.  
 2023/08/19:  Add ecall, ebreak and (u s m)ret instruction.  
 2023/08/20:  Add fence, fence.i instruction (However, it doesn't work).  
+2024/05/24:  Add instruction show command in Interactive mode(Beta, ver. 0.4).  
