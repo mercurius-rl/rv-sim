@@ -1,5 +1,6 @@
 extern crate regex;
 
+//use std::default;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::collections::HashMap;
@@ -85,6 +86,61 @@ pub fn one_line_asm(line: &str) -> u32 {
 
 	if sv.len() > 4 {
 		panic!("sv");
+	}
+
+	// pseudo instruction predecode
+	match sv[0] {
+		"J" | "j" => {
+			// j offset -> jal x0,offset
+			sv[0]	=	"jal";
+			sv[2]	=	sv[1];
+			sv[1]	=	"x0";
+		},
+		"JR" | "jr" => {
+			// jr rs -> jalr x0,rs,0
+			sv[0]	=	"jalr";
+			sv[2]	=	sv[1];
+			sv[1]	=	"x0";
+			sv.push("0");
+		},
+		"BEQZ" | "beqz" => {
+			// beqz rs,offset -> beq rs,x0,offset
+			sv[0]	=	"beq";
+			sv.push(sv[2]);
+			sv[2]	=	"x0";
+		},
+		"BNEZ" | "bnez" => {
+			// bnez rs,offset -> bne rs,x0,offset
+			sv[0]	=	"bne";
+			sv.push(sv[2]);
+			sv[2]	=	"x0";
+		},
+		"BGT" | "bgt" => {
+			// bgt rs,rt,offset -> blt rt,rs,offset
+			sv[0]	=	"blt";
+			let tmp = sv[1];
+			sv[1]	=	sv[2];
+			sv[2]	=	tmp;
+		},
+		"BLE" | "ble" => {
+			// ble rs,rt,offset -> bge rt,rs,offset
+			sv[0]	=	"bge";
+			let tmp = sv[1];
+			sv[1]	=	sv[2];
+			sv[2]	=	tmp;
+		},
+		"LI" | "li" => {
+			// li rd,imm -> addi rd,x0,imm
+			sv[0]	=	"addi";
+			sv.push(sv[2]);
+			sv[2]	=	"x0";
+		},
+		"MV" | "mv" => {
+			// mv rd,rs -> addi rd, rs,0
+			sv[0]	=	"addi";
+			sv.push("0");
+		},
+		_ => {},
 	}
 
 	match sv[0] {
@@ -1188,6 +1244,62 @@ pub fn asm(path: &str, out: &str) {
 
 		if sv.len() > 4 {
 			panic!("sv");
+		}
+
+		// pseudo instruction predecode
+		match sv[0] {
+			"J" | "j" => {
+				// j offset -> jal x0,offset
+				sv[0]	=	"jal";
+				sv[2]	=	sv[1];
+				sv[1]	=	"x0";
+			},
+			"JR" | "jr" => {
+				// jr rs -> jalr x0,rs,0
+				sv[0]	=	"jalr";
+				sv[2]	=	sv[1];
+				sv[1]	=	"x0";
+				sv.push("0");
+			},
+			"BEQZ" | "beqz" => {
+				// beqz rs,offset -> beq rs,x0,offset
+				sv[0]	=	"beq";
+				sv.push(sv[2]);
+				sv[2]	=	"x0";
+			},
+			"BNEZ" | "bnez" => {
+				// bnez rs,offset -> bne rs,x0,offset
+				sv[0]	=	"bne";
+				sv.push(sv[2]);
+				sv[2]	=	"x0";
+			},
+			"BGT" | "bgt" => {
+				// bgt rs,rt,offset -> blt rt,rs,offset
+				sv[0]	=	"blt";
+				let tmp = sv[1];
+				sv[1]	=	sv[2];
+				sv[2]	=	tmp;
+			},
+			"BLE" | "ble" => {
+				// ble rs,rt,offset -> bge rt,rs,offset
+				sv[0]	=	"bge";
+				let tmp = sv[1];
+				sv[1]	=	sv[2];
+				sv[2]	=	tmp;
+			},
+			"LI" | "li" => {
+				// li rd,imm -> addi rd,x0,imm
+				sv[0]	=	"addi";
+				sv.push(sv[2]);
+				sv[2]	=	"x0";
+			},
+			"MV" | "mv" => {
+				// mv rd,rs -> addi rd, rs,0
+				sv[0]	=	"addi";
+				sv.push("0");
+			},
+			"" => {continue;}
+			_ => {},
 		}
 
 		match sv[0] {

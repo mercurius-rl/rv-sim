@@ -82,6 +82,20 @@ rem
 remu
 ```
 
+Please refer to the official RISC-V documentation for information on instruction operands.
+
+#### Pseudo Instruction
+```
+j		// Jump offset			(jal x0, offset)
+jr		// Jump register		(jalr x0,rs,0)
+beqz	// bit equal zero		(beq rs,x0,offset)
+bnez	// bit not equal zero	(bne rs,x0,offset)
+bgt		// bit greater than 	(blt rt,rs,offset)
+ble		// bit less equal		(bge rt,rs,offset)
+li		// load immediate		(addi rd,x0,imm)
+mv		// move register	 	(addi rd,rs,0)
+```
+
 ### Available register names
 ```
  0: "zero" or "x0"
@@ -152,18 +166,18 @@ cargo run <asm source file> <Options>*
 
 ```
 Positional Arguments:
-  src
+	src
 
 Options:
-  -a, --asm         run assembler
-  -o, --output      output assembled binary
-  -s, --sim         run risc-v simulator
-  -b, --bin         binary data file
-  -d, --dbg         debug run
-  -m, --memdump     memory dump (dump length)
-  -c, --ex_count    count of maximum instruction execute
-                    (default: 256)  if you want setting infinity count, set negative number for this parameter.
-  --help            display usage information
+	-a, --asm         run assembler
+	-o, --output      output assembled binary
+	-s, --sim         run risc-v simulator
+	-b, --bin         binary data file
+	-d, --dbg         debug run
+	-m, --memdump     memory dump (dump length)
+	-c, --ex_count    count of maximum instruction execute
+										(default: 256)  if you want setting infinity count, set negative number for this parameter.
+	--help            display usage information
 ```
 
 For example, execute under command if source file name is test.asm and you want to execute debug mode and memory dump mode.
@@ -216,18 +230,18 @@ There is a dedicated command for interactive mode.
 .exit   : Exit interactive mode.
 
 .faddr  : Executes the instruction in instruction memory 
-          pointed to by the current program counter.
+					pointed to by the current program counter.
 
 .addr++ : Increment the program counter.
 
 .addr-- : Decrement the program counter.
-          (However, when the value of the program counter is 4 or more)
+					(However, when the value of the program counter is 4 or more)
 
 .show   : Show several data.  
-          Option:  
-            i -- show current memory instruction information.
-            d -- show current memory data.
-            b -- show current memory data(binary) 
+					Option:  
+						i -- show current memory instruction information.
+						d -- show current memory data.
+						b -- show current memory data(binary) 
 ```
 
 Update history
@@ -244,3 +258,4 @@ Update history
 2023/08/19:  Add ecall, ebreak and (u s m)ret instruction.  
 2023/08/20:  Add fence, fence.i instruction (However, it doesn't work).  
 2024/05/24:  Add instruction show command in Interactive mode(Beta, ver. 0.4).  
+2024/06/01:  Add several pseudo instruction.  
