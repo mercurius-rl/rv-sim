@@ -1156,6 +1156,9 @@ pub fn asm(path: &str, out: &str) {
 	let reader = BufReader::new(file);
 	let mut writer = File::create(out).unwrap();
 
+	let mut label: Vec<(String, u32)> = Vec::new();
+	let mut addr_count: u32 = 0;
+
 	let mut map = HashMap::new();
 	map.insert("zero", 0);
 	map.insert("ra", 1);
@@ -1225,10 +1228,17 @@ pub fn asm(path: &str, out: &str) {
 	let reg = map;
 	
 	let re = Regex::new(r"\ *#.*").unwrap();
+	let le = Regex::new(r"(\ *)([a-zA-Z]+)(:)").unwrap();
 	for line in reader.lines() {
 		let rline = line.unwrap();
 		#[allow(unused_assignments)]
 		let mut line: String = String::new();
+
+		if let Some(caps) = le.captures(&rline) {
+			label.push(((&caps[2]).to_string(), addr_count));
+			continue;
+		}
+
 		if let Some(caps) = re.captures(&rline) {
 			line = rline.replace(caps.get(0).unwrap().as_str(), "");
 		} else {
@@ -1645,7 +1655,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs2: u32 = reg[sv[2]] << 20;
 
 					let funct3: u32 = 0x0 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let rd: u32 = ((imm & 0x1E) + ((imm & 0x800) >> 12)) << 7;
 					let funct7: u32 = (((imm & 0x1E) >> 5) + ((imm & 0x1000) >> 5)) << 25;
@@ -1663,7 +1678,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs2: u32 = reg[sv[2]] << 20;
 
 					let funct3: u32 = 0x1 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let rd: u32 = ((imm & 0x1E) + ((imm & 0x800) >> 12)) << 7;
 					let funct7: u32 = (((imm & 0x1E) >> 5) + ((imm & 0x1000) >> 5)) << 25;
@@ -1681,7 +1701,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs2: u32 = reg[sv[2]] << 20;
 
 					let funct3: u32 = 0x4 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let rd: u32 = ((imm & 0x1E) + ((imm & 0x800) >> 12)) << 7;
 					let funct7: u32 = (((imm & 0x1E) >> 5) + ((imm & 0x1000) >> 5)) << 25;
@@ -1699,7 +1724,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs2: u32 = reg[sv[2]] << 20;
 
 					let funct3: u32 = 0x5 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let rd: u32 = ((imm & 0x1E) + ((imm & 0x800) >> 12)) << 7;
 					let funct7: u32 = (((imm & 0x1E) >> 5) + ((imm & 0x1000) >> 5)) << 25;
@@ -1717,7 +1747,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs2: u32 = reg[sv[2]] << 20;
 
 					let funct3: u32 = 0x6 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let rd: u32 = ((imm & 0x1E) + ((imm & 0x800) >> 12)) << 7;
 					let funct7: u32 = (((imm & 0x1E) >> 5) + ((imm & 0x1000) >> 5)) << 25;
@@ -1735,7 +1770,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs2: u32 = reg[sv[2]] << 20;
 
 					let funct3: u32 = 0x7 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let rd: u32 = ((imm & 0x1E) + ((imm & 0x800) >> 12)) << 7;
 					let funct7: u32 = (((imm & 0x1E) >> 5) + ((imm & 0x1000) >> 5)) << 25;
@@ -1911,7 +1951,12 @@ pub fn asm(path: &str, out: &str) {
 					let op: u32 = 0x6F;
 					let rd: u32 = reg[sv[1]] << 7;
 
-					let imm: u32 = sv[2].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[2]) {
+						*i
+					} else {
+						sv[2].parse().unwrap()
+					};
+					//let imm: u32 = sv[2].parse().unwrap();
 
 					let imm1: u32 = imm & 0xFF000;
 					let imm2: u32 = ((imm & 0x7FE) + ((imm & 0x800) >> 10) + ((imm & 0x100000) >> 9)) << 20;
@@ -1929,7 +1974,12 @@ pub fn asm(path: &str, out: &str) {
 					let rs1: u32 = reg[sv[2]] << 15;
 
 					let funct3: u32 = 0x0 << 12;
-					let imm: u32 = sv[3].parse().unwrap();
+					let imm: u32 = if let Some((_, i)) = label.clone().iter().find(|(x, _)| x == sv[3]) {
+						*i
+					} else {
+						sv[3].parse().unwrap()
+					};
+					//let imm: u32 = sv[3].parse().unwrap();
 
 					let imm1: u32 = imm << 20;
 
@@ -2198,5 +2248,6 @@ pub fn asm(path: &str, out: &str) {
 
 			}
 		}
+		addr_count += 4;
 	}
 }

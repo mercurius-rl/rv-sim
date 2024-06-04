@@ -6,8 +6,8 @@ use argh::FromArgs;
 
 use crate::asm_f::one_line_asm;
 
-static VERSION: &str = "v0.4 Beta";
-static UPDATETIME: &str = "May 24 2024";
+static VERSION: &str = "v0.5 Beta";
+static UPDATETIME: &str = "June 5 2024";
 
 #[cfg(target_os = "windows")]
 fn show_platform() -> String {

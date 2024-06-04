@@ -1,7 +1,7 @@
 RISC-V Simulator written in Rust lang
 ===============================
 
-- ver.0.4
+- ver.0.5
 
 This is a simple RISC-V simulator and RISC-V Assembler tools.
 This simulator supports executing part of RV32IM.
@@ -259,3 +259,4 @@ Update history
 2023/08/20:  Add fence, fence.i instruction (However, it doesn't work).  
 2024/05/24:  Add instruction show command in Interactive mode(Beta, ver. 0.4).  
 2024/06/01:  Add several pseudo instruction.  
+2024/06/05:  Implement Label Jump(Beta, ver. 0.5).
